@@ -1,73 +1,83 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
-</p>
+# expense-check-api
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API para análise de imagens utilizando integração com o Google Gemini e desenvolvida em Node.js utilizando o Nest.js, com TypeOrm e banco de dados PostgreSQL. O projeto está conteinerizado usando Docker, permitindo fácil configuração e execução.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Pré-requisitos
 
-## Description
+### Sem Docker
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- Node.js
+- NPM
+- PostgreSQL
+- Git (Opcional)
+- GitHub (Opcional)
 
-## Installation
+### Com Docker
 
-```bash
-$ npm install
-```
+- Docker
+- Docker Compose
+- Git (Opcional)
+- GitHub (Opcional)
 
-## Running the app
+## Configuração
 
-```bash
-# development
-$ npm run start
+### Sem Docker
 
-# watch mode
-$ npm run start:dev
+1. **Clone o repositório:**
 
-# production mode
-$ npm run start:prod
-```
+    ```bash
+    git clone https://github.com/Jeferson-Mendes/expense-check-api.git
+    cd expense-check-api
+    ```
 
-## Test
+2. **Configure o banco de dados PostgreSQL:**
 
-```bash
-# unit tests
-$ npm run test
+    Crie um banco de dados PostgreSQL e um usuário. Anote as credenciais para serem usadas no `.env` do seu projeto.
 
-# e2e tests
-$ npm run test:e2e
+3. **Configure o `.env`:**
 
-# test coverage
-$ npm run test:cov
-```
+    Abra o arquivo `.env` e configure as propriedades do banco de dados conforme necessário (Para rodar localmente, basta configurar o `GEMINI_API_KEY`).:
 
-## Support
+    ```properties
+    GEMINI_API_KEY={API-KEY}
+    ```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+4. **Instale as dependências:**
 
-## Stay in touch
+    ```bash
+    npm run install
+    ```
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+5. **Execute a aplicação em ambiente de desenvolvimento:**
 
-## License
+    ```bash
+    npm run start:dev
+    ```
 
-Nest is [MIT licensed](LICENSE).
+A aplicação estará disponível em `http://localhost:3000`.
+
+### Com o Docker instalado
+
+1. **Clone o repositório:**
+
+    ```bash
+    git clone https://github.com/Jeferson-Mendes/expense-check-api.git
+    cd expense-check-api
+
+3. **Crie e execute seu aplicativo com o Compose:**
+
+    ```bash
+    docker compose up
+    ```
+
+    Isso irá construir as imagens Docker e iniciar os contêineres do PostgreSQL e da aplicação Nest.js.
+
+A aplicação estará disponível em `http://localhost:3000`.
+
+## Endpoints da API
+
+A API possui os seguintes endpoints:
+
+- `POST /measures/upload`: Recebe uma imagem em um conteúdo multipart/form-data, além de outras informações sobre a medição
+- `PATCH /measures/confirm`: Serve para confirmar ou corrigir um valor lido pela LLM
+- `PATCH /measures/{consumer_code}/list?measure_type=WATER`: Serve para retornar uma lista com todas as leituras do consumidor, com a opção de filtragem (WATER ou GAS)
