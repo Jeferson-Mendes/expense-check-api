@@ -35,6 +35,7 @@ export class GeminiApi {
 
       return result.response.text();
     } catch (error) {
+      console.log(error);
       throw new InternalServerErrorException('Erro de servidor');
     }
   }
@@ -63,6 +64,7 @@ export class GeminiApi {
     } catch (error) {
       rmSync(tempFilePath, { recursive: true }); // Remove file after upload
       rmSync(tempDir, { recursive: true }); // Remove folder after upload
+      console.log(error);
       throw new InternalServerErrorException('Erro de servidor');
     }
   }

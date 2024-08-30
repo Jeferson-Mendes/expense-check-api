@@ -46,7 +46,7 @@ export class MeasuresService {
     const existingMeasure = await this.measureRepo
       .createQueryBuilder('measure')
       .where('measure.customer_code = :customerCode', { customerCode })
-      .where('measure.measure_type = :measureType', { measureType })
+      .andWhere('measure.measure_type = :measureType', { measureType })
       .andWhere('measure.measure_datetime >= :startOfMonth', { startOfMonth })
       .andWhere('measure.measure_datetime <= :endOfMonth', { endOfMonth })
       .getOne();
