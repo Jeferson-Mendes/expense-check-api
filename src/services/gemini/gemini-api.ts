@@ -2,6 +2,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { GoogleAIFileManager } from '@google/generative-ai/server';
 import * as path from 'path';
 import { mkdtempSync, rmSync, writeFileSync } from 'fs';
+import { InternalServerErrorException } from '@nestjs/common';
 
 export class GeminiApi {
   private genAi: GoogleGenerativeAI;
@@ -28,13 +29,13 @@ export class GeminiApi {
           },
         },
         {
-          text: 'Extraia o valor numérico do medidor presente na imagem a seguir. Retorne apenas o número, sem unidades ou outros caracteres.',
+          text: 'Extraia o valor numérico do medidor presente na imagem a seguir. Retorne apenas o número, sem unidades, sem pontos, vírgulas ou outros caracteres.',
         },
       ]);
 
       return result.response.text();
     } catch (error) {
-      throw new Error(error);
+      throw new InternalServerErrorException('Erro de servidor');
     }
   }
 
@@ -62,7 +63,7 @@ export class GeminiApi {
     } catch (error) {
       rmSync(tempFilePath, { recursive: true }); // Remove file after upload
       rmSync(tempDir, { recursive: true }); // Remove folder after upload
-      throw new Error(error);
+      throw new InternalServerErrorException('Erro de servidor');
     }
   }
 }

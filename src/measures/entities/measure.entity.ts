@@ -10,6 +10,9 @@ export class Measure {
   @PrimaryGeneratedColumn('uuid')
   measure_uuid: string;
 
+  @Column()
+  customer_code: string;
+
   @Column({ type: 'bigint' })
   measure_datetime: number;
 

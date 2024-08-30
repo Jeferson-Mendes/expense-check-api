@@ -1,10 +1,15 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateMeasureDto } from './dto/create-measure.dto';
-// import { UpdateMeasureDto } from './dto/update-measure.dto';
 import { GeminiApi } from '../services/gemini/gemini-api';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Measure, MeasureType } from './entities/measure.entity';
 import { Between, Repository } from 'typeorm';
+import { ConfirmMeasureDto } from './dto/confirm-measure.dto';
 
 @Injectable()
 export class MeasuresService {
@@ -37,7 +42,7 @@ export class MeasuresService {
     const { image, measure_type } = createMeasureDto;
     const geminiApi = new GeminiApi(process.env.GEMINI_API_KEY);
 
-    if (this.hasMeasureInCurrentMonth(measure_type)) {
+    if (await this.hasMeasureInCurrentMonth(measure_type)) {
       throw new ConflictException('Leitura do mês já realizada');
     }
 
@@ -52,35 +57,44 @@ export class MeasuresService {
       mimeType: uploadFileResponse.file.mimeType,
     });
 
+    const processedImageNumberResponse = Number(processedImageTextResponse);
+
     const measure = this.measureRepo.create({
       image_url: uploadFileResponse.file.uri,
       measure_datetime: new Date(createMeasureDto.measure_datetime).getTime(),
       measure_type: createMeasureDto.measure_type,
-      measure_value: Number(processedImageTextResponse),
+      measure_value: processedImageNumberResponse,
     });
 
     const measureRecord = await this.measureRepo.save(measure);
 
     return {
       image_url: uploadFileResponse.file.uri,
-      measure_value: processedImageTextResponse,
+      measure_value: processedImageNumberResponse,
       measure_uuid: measureRecord.measure_uuid,
     };
   }
 
-  // findAll() {
-  //   return `This action returns all measures`;
-  // }
+  async confirm(confirmMeasureDto: ConfirmMeasureDto) {
+    const { measure_uuid, confirmed_value } = confirmMeasureDto;
+    const record = await this.measureRepo.findOne({ where: { measure_uuid } });
 
-  // findOne(id: number) {
-  //   return `This action returns a #${id} measure`;
-  // }
+    if (!record) {
+      throw new NotFoundException('Leitura do mês já realizada');
+    }
+    if (record.has_confirmed) {
+      throw new ConflictException('Leitura do mês já realizada');
+    }
 
-  // update(id: number, updateMeasureDto: UpdateMeasureDto) {
-  //   return `This action updates a #${id} measure`;
-  // }
+    try {
+      await this.measureRepo.update(
+        { measure_uuid },
+        { measure_value: confirmed_value, has_confirmed: true },
+      );
 
-  // remove(id: number) {
-  //   return `This action removes a #${id} measure`;
-  // }
+      return { success: true };
+    } catch (error) {
+      throw new InternalServerErrorException('Erro de servidor');
+    }
+  }
 }

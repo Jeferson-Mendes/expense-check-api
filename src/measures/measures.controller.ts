@@ -4,9 +4,11 @@ import {
   Body,
   UseInterceptors,
   UploadedFile,
+  Patch,
 } from '@nestjs/common';
 import { MeasuresService } from './measures.service';
 import { CreateMeasureDto } from './dto/create-measure.dto';
+import { ConfirmMeasureDto } from './dto/confirm-measure.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { getFileValidator } from './file.validator';
 
@@ -23,23 +25,8 @@ export class MeasuresController {
     return this.measuresService.create({ ...createMeasureDto, image });
   }
 
-  // @Get()
-  // findAll() {
-  //   return this.measuresService.findAll();
-  // }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.measuresService.findOne(+id);
-  // }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateMeasureDto: UpdateMeasureDto) {
-  //   return this.measuresService.update(+id, updateMeasureDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.measuresService.remove(+id);
-  // }
+  @Patch('/confirm')
+  update(@Body() confirmMeasureDto: ConfirmMeasureDto) {
+    return this.measuresService.confirm(confirmMeasureDto);
+  }
 }
