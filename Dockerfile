@@ -1,15 +1,13 @@
-FROM node:20.17.0-alpine as builder
+FROM node:20.17.0-alpine
 
-ENV NODE_ENV build
+WORKDIR /usr/src/api
 
-# USER node
-WORKDIR /home/node
+COPY . .
 
-COPY package*.json ./
-RUN npm ci
+RUN npm install
 
-COPY --chown=node:node . .
-RUN npm run build \
-    && npm prune --production
+RUN npm run build
 
-CMD ["node", "dist/main.js"]
+EXPOSE 3000
+
+CMD ["npm", "run", "start:prod"]
